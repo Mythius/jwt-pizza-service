@@ -68,6 +68,15 @@ test("create store", async () => {
     roles: [{ role: Role.Franchisee, object: "MS Pizzas" }],
   });
 
+  // Add Diner Order
+
+  let order = { franchiseId: f.id, storeId: store.id, items: [{ menuId:1, description:'Hot Pep Pizza', price: 22}] };
+  await DB.addDinerOrder(a, order);
+
+  
+  let o = await DB.getOrders(a);
+  expect(o.orders.length).toBe(1);
+
   // Clean up and Test Delete
   await DB.deleteStore(f.id, r.stores[0].id);
   let df = await DB.deleteFranchise(f.id);
@@ -79,6 +88,19 @@ test("unknown person", async () => {
   expect(DB.getUser("rando", "123")).rejects.toThrow("unknown user");
 });
 
+test("unknown franchize", async () => {
+  let error = false;
+  try {
+    await DB.createFranchise({
+      name: "MS Pizzas",
+      admins: [{ email: "random-email@gmail.com" }],
+    });
+  } catch (e) {
+    error = true;
+  }
+  expect(error).toBe(true);
+});
+
 test("update user and login", async () => {
   await DB.initialized;
   let u = await DB.addUser({
@@ -87,15 +109,19 @@ test("update user and login", async () => {
     password: "abc123111111",
     roles: [{ role: Role.Admin }],
   });
-  await DB.updateUser(u.id,'aaa@gmail.com','MnMnMn');
+  await DB.updateUser(u.id, "aaa@gmail.com", "MnMnMn");
 
-  let token = 'hi';
-  await DB.loginUser(u.id,token);
+  let token = "hi";
+  await DB.loginUser(u.id, token);
 
   let li = await DB.isLoggedIn(token);
   expect(li).toBe(true);
 
   await DB.logoutUser(token);
+
+  let o = await DB.getOrders(u);
+  // console.log(o);
+  expect(o.orders.length).toBe(0);
 
   li = await DB.isLoggedIn(token);
   expect(li).toBe(false);
