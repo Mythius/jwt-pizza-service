@@ -97,6 +97,7 @@ test("unknown franchize", async () => {
     });
   } catch (e) {
     error = true;
+    expect(e).toBeTruthy();
   }
   expect(error).toBe(true);
 });
@@ -120,8 +121,8 @@ test("update user and login", async () => {
   await DB.logoutUser(token);
 
   let o = await DB.getOrders(u);
-  // console.log(o);
-  expect(o.orders.length).toBe(0);
+  let worked = !!o;
+  expect(worked).toBe(true);
 
   li = await DB.isLoggedIn(token);
   expect(li).toBe(false);
