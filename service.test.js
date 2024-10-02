@@ -38,6 +38,7 @@ test('create store',async ()=>{
     expect(a.name).toBe('Matthias');
     let f = await DB.createFranchise({name:'MS Pizzas',admins:[{email:'southwickmatthias@gmail.com'}]});
     let store = await DB.createStore(f.id,{name:'M Store 1'})
+    expect(store.name).toBe('M Store 1');
     let r = await DB.getFranchise(f);
     expect(r.name).toBe('MS Pizzas');
     expect(r.stores[0].name).toBe('M Store 1');
