@@ -1,0 +1,1 @@
+fetch('http://localhost:3000/api/auth',{method:'PUT',headers:{"Content-Type":'application/json'},body:JSON.stringify({email:'test@test.test',password:'test'})}).then(e=>e.json().then(console.log));

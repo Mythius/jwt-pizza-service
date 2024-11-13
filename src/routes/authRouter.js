@@ -58,7 +58,10 @@ async function setAuthUser(req, res, next) {
 // Authenticate token
 authRouter.authenticateToken = (req, res, next) => {
   if (!req.user) {
+    module.exports.fail_auth_attempts++;
     return res.status(401).send({ message: 'unauthorized' });
+  } else {
+    module.exports.success_auth_attempts++;
   }
   next();
 };
@@ -73,6 +76,7 @@ authRouter.post(
     }
     const user = await DB.addUser({ name, email, password, roles: [{ role: Role.Diner }] });
     const auth = await setAuth(user);
+    module.exports.active_users++;
     res.json({ user: user, token: auth });
   })
 );
@@ -82,8 +86,10 @@ authRouter.put(
   '/',
   asyncHandler(async (req, res) => {
     const { email, password } = req.body;
+    console.log(req.body);
     const user = await DB.getUser(email, password);
     const auth = await setAuth(user);
+    module.exports.active_users++;
     res.json({ user: user, token: auth });
   })
 );
@@ -94,6 +100,7 @@ authRouter.delete(
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
     clearAuth(req);
+    module.exports.active_users--;
     res.json({ message: 'logout successful' });
   })
 );
@@ -136,4 +143,4 @@ function readAuthToken(req) {
   return null;
 }
 
-module.exports = { authRouter, setAuthUser };
+module.exports = { authRouter, setAuthUser, active_users:0, success_auth_attempts:0,fail_auth_attempts:0 };
