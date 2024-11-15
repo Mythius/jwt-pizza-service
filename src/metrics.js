@@ -83,7 +83,7 @@ class Metrics {
           console.error("Failed to push metrics data to Grafana");
           console.error(response);
         } else {
-          console.log(`Pushed ${metric}`);
+          // console.log(`Pushed ${metric}`);
         }
       })
       .catch((error) => {
@@ -109,7 +109,6 @@ const m = new Metrics();
 
 function requestTracker(req, res, next) {
   m.incramentType(req.method);
-  console.log(req.url);
   next();
 }
 

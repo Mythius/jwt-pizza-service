@@ -4,6 +4,7 @@ const { Role, DB } = require('../database/database.js');
 const { authRouter } = require('./authRouter.js');
 const { asyncHandler, StatusCodeError } = require('../endpointHelper.js');
 const metricData = require('../metrics.js').data;
+const {log} = require('../logger.js');
 
 const orderRouter = express.Router();
 
@@ -89,14 +90,21 @@ orderRouter.post(
     let t2 = new Date();
     const j = await r.json();
     metricData.pizza_creation_latency = ((t2-t1)/1000).toFixed(2);
+    let status = '';
     if (r.ok) {
       metricData.pizzas_sold++;
       metricData.revenue += order.price;
+      status = 'success';
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
     } else {
       metricData.order_failure++;
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportUrl: j.reportUrl });
+      status = 'error';
     }
+    log('info','factory',{
+      order,
+      status,
+    })
   })
 );
 
