@@ -96,6 +96,9 @@ orderRouter.post(
       metricData.revenue += order.price;
       status = 'success';
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
+      log('info','factory_url',{
+        url: j.reportUrl
+      })
     } else {
       metricData.order_failure++;
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportUrl: j.reportUrl });
