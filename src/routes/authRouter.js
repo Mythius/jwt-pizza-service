@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config.js');
 const { asyncHandler } = require('../endpointHelper.js');
 const { DB, Role } = require('../database/database.js');
+const {log} = require('../logger.js');
 
 const authRouter = express.Router();
 
@@ -116,9 +117,22 @@ authRouter.put(
     if (user.id !== userId && !user.isRole(Role.Admin)) {
       return res.status(403).json({ message: 'unauthorized' });
     }
-
+    
     const updatedUser = await DB.updateUser(userId, email, password);
     res.json(updatedUser);
+  })
+);
+
+authRouter.put(
+  '/chaos/:state',
+  authRouter.authenticateToken,
+  asyncHandler(async (req, res) => {
+    if (!req.user.isRole(Role.Admin)) {
+      throw new StatusCodeError('unknown endpoint', 404);
+    }
+    log('error','chaos','STATE: '+req.params.state);
+    enableChaos = req.params.state === 'true';
+    res.json({ chaos: enableChaos });
   })
 );
 
