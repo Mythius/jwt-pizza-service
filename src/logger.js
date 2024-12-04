@@ -19,7 +19,7 @@ exports.log = function (level,type,obj){
 function getPlatform(req) {
   const userAgent = req.headers["user-agent"];
   let platform = "unknown";
-
+  if(!userAgent) return '';
   if (userAgent.includes("Windows")) {
     platform = "windows";
   } else if (userAgent.includes("Macintosh")) {
